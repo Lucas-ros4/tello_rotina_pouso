@@ -1,0 +1,6 @@
+[
+  {"comando": "aruco"},
+  {"comando": "decolar"},
+  {"comando": "subir", "valor": 30},
+  {"comando": "frente", "valor": 150}
+]
