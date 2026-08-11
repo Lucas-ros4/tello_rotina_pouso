@@ -1,5 +1,7 @@
 # Tello ArUco Landing — Pouso Autônomo em Marcador ArUco
 
+[![Assista à demonstração](https://img.youtube.com/vi/8bLkRrrKNyQ/maxresdefault.jpg)](https://youtu.be/8bLkRrrKNyQ)
+
 Projeto em ROS 2 que controla um drone DJI Tello para **identificar, se alinhar e pousar automaticamente sobre um marcador ArUco**, usando visão computacional (OpenCV) e uma câmera adaptada para olhar para baixo.
 
 ## Objetivo
@@ -98,10 +100,6 @@ Como o Tello já sofre com resolução de câmera limitada, optamos por um marca
 - Ajuste dinâmico da tolerância de alinhamento conforme a altura do drone (quanto mais baixo, menor a tolerância necessária em pixels para equivaler à mesma precisão em cm reais).
 - Melhorar a robustez da detecção em condições de pouca luz.
 - Testes com múltiplos marcadores para pouso em diferentes plataformas na mesma missão.
-
-## Vídeo de demonstração
-
-[https://youtu.be/8bLkRrrKNyQ](https://youtu.be/8bLkRrrKNyQ)
 
 ## Requisitos
 
