@@ -1,4 +1,4 @@
-# Tello ArUco Landing — Pouso Autônomo em Marcador ArUco
+# Pouso Autônomo em Marcador ArUco
 
 [![Assista à demonstração](https://img.youtube.com/vi/8bLkRrrKNyQ/maxresdefault.jpg)](https://youtu.be/8bLkRrrKNyQ)
 
@@ -18,8 +18,8 @@ Todo o comportamento do drone (decolagem, movimentos, ativação da detecção, 
 
 O node roda um loop de detecção de ArUco a ~30 FPS em paralelo à execução da missão (que roda em uma thread separada). Assim que um marcador com ID válido é identificado, enquanto o drone está voando:
 
-1. A missão em andamento é **cancelada imediatamente** — nenhum novo comando da lista JSON é enviado a partir desse momento.
-2. Começa a **rotina de pouso alinhado**: a cada ciclo, o código calcula o desvio (offset) do centro do marcador em relação ao centro da imagem e corrige um eixo por vez — primeiro o deslocamento lateral (esquerda/direita), depois frente/trás — em passos fixos de movimento.
+1. A missão em andamento é **cancelada imediatamente**  nenhum novo comando da lista JSON é enviado a partir desse momento.
+2. Começa a **rotina de pouso alinhado**: a cada ciclo, o código calcula o desvio (offset) do centro do marcador em relação ao centro da imagem e corrige um eixo por vez  primeiro o deslocamento lateral (esquerda/direita), depois frente/trás em passos fixos de movimento.
 3. Quando o drone está alinhado dentro de uma tolerância aceitável, ele desce um pouco e reavalia, repetindo o processo até estar alinhado e baixo o suficiente para pousar.
 4. Existe um **tempo limite de segurança**: se o drone não conseguir se alinhar completamente dentro desse prazo, ele pousa onde estiver, em vez de tentar indefinidamente (ver seção de limitações abaixo sobre o motivo disso ser necessário).
 5. Se o marcador sair do campo de visão da câmera durante o alinhamento, o código tenta desfazer o último movimento (na tentativa de reencontrá-lo); se mesmo assim continuar sem detectar por tempo demais, o drone pousa onde estiver, por segurança.
@@ -93,13 +93,6 @@ Como o Tello já sofre com resolução de câmera limitada, optamos por um marca
 - **Sem calibração de câmera real**: a estimativa de posição hoje é baseada apenas no deslocamento em pixels do centro do marcador em relação ao centro da imagem — não há calibração real da câmera (matriz intrínseca/distorção), então não há estimativa precisa de distância real (metros) até o marcador.
 - **Estabilidade de rede**: comandos e vídeo trafegam pela rede wifi própria do Tello; sinal fraco ou interferência pode causar atrasos ou, em casos extremos, acionar o pouso automático de segurança do próprio drone.
 
-## Melhorias futuras
-
-- Calibração real da câmera (matriz intrínseca + coeficientes de distorção) para estimativa de pose via `solvePnP`, permitindo saber a distância real até o marcador em metros.
-- Alinhamento mais suave, usando controle de velocidade contínuo (RC control) em vez de comandos de deslocamento discretos de 20 cm.
-- Ajuste dinâmico da tolerância de alinhamento conforme a altura do drone (quanto mais baixo, menor a tolerância necessária em pixels para equivaler à mesma precisão em cm reais).
-- Melhorar a robustez da detecção em condições de pouca luz.
-- Testes com múltiplos marcadores para pouso em diferentes plataformas na mesma missão.
 
 ## Requisitos
 
