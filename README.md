@@ -64,6 +64,24 @@ ros2 topic echo /tello/status
 
 A imagem da câmera também é publicada em `/tello/image_raw`, para uso por outros nodes ou ferramentas como `rqt_image_view`.
 
+## Por que o dicionário ArUco `4X4_50`
+
+O OpenCV oferece vários dicionários de marcadores ArUco, variando em dois eixos: o tamanho da grade interna (4x4, 5x5, 6x6...) e a quantidade de IDs disponíveis (50, 100, 250...). A escolha de `DICT_4X4_50` não foi arbitrária — considerou o hardware disponível:
+
+- **Grade 4x4 (menos bits)**: quanto menor a grade interna do marcador, menos pixels a câmera precisa resolver claramente para decodificar o ID corretamente. Isso é importante porque a câmera do Tello tem resolução e qualidade inferiores às de uma webcam comum, e ainda passa pela adaptação física (espelho) que já introduz alguma perda de nitidez. Dicionários maiores (5x5, 6x6, 7x7) até oferecem mais robustez teórica contra erros de leitura, mas exigem uma imagem bem mais nítida/próxima para serem lidos — o que não é realista nesse setup. Na prática, os padrões de detecção do OpenCV já vieram mais rígidos que o necessário para essa câmera (como vimos durante os testes), então usar uma grade maior só pioraria a taxa de detecção.
+- **Apenas 50 IDs**: o projeto não precisa de centenas de marcadores diferentes — a lista de pouso válida (`IDS_VALIDOS_POUSO`) usa só 5 IDs (1 a 5). Um dicionário de 50 já sobra bastante margem, sem pagar o custo de complexidade adicional de um dicionário maior (mais bits para decodificar = mais chance de erro na leitura).
+
+Em resumo: **priorizamos confiabilidade de leitura em condições de câmera ruim/distância maior, em vez de ter uma quantidade enorme de IDs únicos**, que o projeto simplesmente não precisa.
+
+### Sobre o tamanho físico do marcador impresso
+
+O tamanho do marcador impresso (o valor usado em `MARKER_LENGTH_M` nos scripts de calibração/pose) também é um trade-off direto:
+
+- **Marcador maior**: fica visível e decodificável de uma altura maior, dando mais margem para o drone iniciar o alinhamento de longe. Em compensação, ocupa mais espaço físico no chão/plataforma de pouso.
+- **Marcador menor**: só é confiavelmente identificado quando o drone já está bem próximo/baixo, o que reduz a janela de tempo disponível para a rotina de alinhamento agir antes do pouso.
+
+Como o Tello já sofre com resolução de câmera limitada, optamos por um marcador **grande o suficiente para ser identificado com folga de altura**, dando tempo real para a rotina de correção de posição atuar antes da fase final de descida — em vez de um marcador pequeno, que só apareceria tarde demais no processo.
+
 ## Limitações conhecidas
 
 - **Passo mínimo de movimento de 20 cm**: o Tello não aceita comandos de deslocamento menores que 20 cm — é uma limitação do próprio firmware/SDK, não do código. Isso impede ajustes finos durante o alinhamento; o drone corrige em "saltos" de 20 cm, o que pode levar a overshoot (passar do ponto ideal) especialmente em alturas baixas.
@@ -83,7 +101,7 @@ A imagem da câmera também é publicada em `/tello/image_raw`, para uso por out
 
 ## Vídeo de demonstração
 
-*(link do vídeo aqui)*
+[https://youtu.be/8bLkRrrKNyQ](https://youtu.be/8bLkRrrKNyQ)
 
 ## Requisitos
 
